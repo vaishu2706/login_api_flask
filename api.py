@@ -1,8 +1,10 @@
 
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 import psycopg2
 
 app = Flask(__name__)
+CORS(app)
 
 # PostgreSQL Connection
 def get_db_connection():
@@ -50,7 +52,7 @@ def get_users():
         cur.close()
         conn.close()
 
-        return jsonify([{"id": user[0], "name": user[1], "email": user[2]} for user in users])
+        return jsonify([{"id": u[0], "name": u[1], "email": u[2]} for u in users])
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

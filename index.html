@@ -1,0 +1,78 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authentication System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex justify-center items-center min-h-screen">
+    <div class="bg-white p-6 rounded shadow-md w-96">
+        <h2 class="text-xl font-bold mb-4 text-center">User Authentication</h2>
+
+        <!-- Register Form -->
+        <h3 class="text-lg font-semibold">Register</h3>
+        <input type="text" id="reg_name" placeholder="Name" class="w-full p-2 border rounded mb-2">
+        <input type="email" id="reg_email" placeholder="Email" class="w-full p-2 border rounded mb-2">
+        <input type="password" id="reg_password" placeholder="Password" class="w-full p-2 border rounded mb-2">
+        <button onclick="register()" class="w-full bg-blue-500 text-white py-2 rounded">Register</button>
+
+        <hr class="my-4">
+
+        <!-- Login Form -->
+        <h3 class="text-lg font-semibold">Login</h3>
+        <input type="email" id="login_email" placeholder="Email" class="w-full p-2 border rounded mb-2">
+        <input type="password" id="login_password" placeholder="Password" class="w-full p-2 border rounded mb-2">
+        <button onclick="login()" class="w-full bg-green-500 text-white py-2 rounded">Login</button>
+
+        <hr class="my-4">
+
+        <button onclick="getUsers()" class="w-full bg-purple-500 text-white py-2 rounded">Fetch Users (Admin Only)</button>
+
+        <pre id="response" class="mt-4 text-sm text-gray-700"></pre>
+    </div>
+
+    <script>
+        const API_URL = "http://127.0.0.1:5000";
+        let token = "";
+
+        async function register() {
+            const name = document.getElementById("reg_name").value;
+            const email = document.getElementById("reg_email").value;
+            const password = document.getElementById("reg_password").value;
+
+            const res = await fetch(`${API_URL}/register`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name, email, password })
+            });
+
+            document.getElementById("response").innerText = await res.text();
+        }
+
+        async function login() {
+            const email = document.getElementById("login_email").value;
+            const password = document.getElementById("login_password").value;
+
+            const res = await fetch(`${API_URL}/login`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, password })
+            });
+
+            const data = await res.json();
+            token = data.token || "";
+            document.getElementById("response").innerText = JSON.stringify(data, null, 2);
+        }
+
+        async function getUsers() {
+            const res = await fetch(`${API_URL}/users`, {
+                headers: { "Authorization": `Bearer ${token}` }
+            });
+
+            document.getElementById("response").innerText = await res.text();
+        }
+    </script>
+</body>
+</html>
